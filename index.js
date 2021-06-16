@@ -2,21 +2,12 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
-const port = 9000 // 3000-9500
+const port = process.env.PORT || 9000
 require('dotenv').config()
 const atlasPass = process.env.ATLAS_DB_PASSWORD
 const atlasDBName = process.env.ATLAS_DB_NAME
 const uri = `mongodb+srv://JesseHouser:${atlasPass}@cluster-grottogear0.kdmlt.mongodb.net/${atlasDBName}?retryWrites=true&w=majority`
-const { Schema } = mongoose
-
-const gearSchema = new Schema({
-  type: String,
-  brand: String,
-  model: String,
-  quantity: Number
-})
-
-const Gear = mongoose.model('Gear', gearSchema)
+const Gear = require("./models/gear")
 
 app.use(cors())
 app.use(express.json())
@@ -30,10 +21,26 @@ app.get('/gear', (request, response) => {
     .then(gears => response.send(gears))
  })
 
- app.post('/gear', (request, response) => {
+app.get('/gear/:id', (request, response) => {
+  Gear.find({_id: request.params.id})
+  .then(gear => response.send(gear))
+})
+
+app.post('/gear', (request, response) => {
   const { gear } = request.body
   Gear.create(gear)
     .then(gear => response.send(gear))
+})
+
+app.patch('/gear/:id', (request, response) => {
+  const { gear } = request.body
+  Gear.updateOne({_id: request.params.id}, gear)
+  .then(gear => response.send(gear))
+})
+
+app.delete('/gear/:id', (request, response) => {
+  Gear.deleteOne({_id: request.params.id})
+  .then(gear => response.send(gear))
 })
 
 app.listen(port, () => console.log(`listening on port ${port}`))
