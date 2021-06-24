@@ -7,10 +7,13 @@ require('dotenv').config()
 const atlasPass = process.env.ATLAS_DB_PASSWORD
 const atlasDBName = process.env.ATLAS_DB_NAME
 const uri = `mongodb+srv://JesseHouser:${atlasPass}@cluster-grottogear0.kdmlt.mongodb.net/${atlasDBName}?retryWrites=true&w=majority`
-const Gear = require("./models/gear")
+const Gear = require("./models/Gear")
+const authRoutes = require('./routes/auth');
+const { db } = require('./models/User');
 
 app.use(cors())
 app.use(express.json())
+app.use('/api', authRoutes);
 
 mongoose.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true})
   .then(() => console.log('MONGODB CONNECTED'))
